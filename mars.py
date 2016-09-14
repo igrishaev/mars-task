@@ -26,12 +26,12 @@ def compose_results(results):
 
     def process(node):
         ok, (x, y, ori) = node
-        return '%s %s %s %s' % (
+        return ('%s %s %s %s' % (
             x, y, ori, ("" if ok else "LOST")
-        )
+        )).strip()
 
 
-    return ''.join(map(process, results))
+    return '\n'.join(map(process, results))
 
 
 def make_robot(x, y, ori):
@@ -176,7 +176,7 @@ def test_rotate_simple():
     res = play(10, 20, (
         (0, 0, "N", "L"),
     ))
-    assert_eq(res, ((True, (0, 0, 'W')), ))
+    assert_eq(res, ((True, (0, 0, 'W')),))
 
 
 def test_rotate_full():
@@ -221,6 +221,16 @@ def test_scent_more():
         (True, (6, 19, 'E')),
     ))
 
+
+def test_composer():
+    output = compose_results((
+        (True, (1, 2, "N")),
+        (False, (5, 20, "L")),
+        (True, (8, 42, "S")),
+    ))
+    assert_eq(output, """1 2 N
+5 20 L LOST
+8 42 S""")
 
 
 def main_tests():
