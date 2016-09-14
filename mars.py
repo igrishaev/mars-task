@@ -22,7 +22,7 @@ def parse_input(source):
     pass
 
 
-def compose_output(results):
+def compose_results(results):
     # todo
     return ""
 
@@ -58,10 +58,9 @@ def move_robot(robot):
 
     rules = {
         "N": (0, 1),
-        "W": (1, 0),
+        "W": (-1, 0),
         "S": (0, -1),
-        "E": (-1, 0)
-
+        "E": (1, 0),
     }
 
     dx, dy = rules[ori]
@@ -131,23 +130,10 @@ def play(x, y, routes):
     return results
 
 
-
 def main():
-
-    # x, y, routes = (10, 20, [
-    #     (3, 19, "N", ("F", "F", "F")),
-    #     (3, 19, "N", ("F", "F", "F")),
-    # ])
-
-    x, y, routes = (10, 20, [
-        (0, 0, "N", ("F", "L", "F")),
-        # (3, 19, "N", ("F", "F", "F")),
-    ])
-
-    # x, y, routes = parse_input(sys.stdin)
-
+    x, y, routes = parse_input(sys.stdin)
     results = play(x, y, routes)
-    print results
+    print compose_results(results)
 
 
 # ---- tests
@@ -161,11 +147,19 @@ def assert_eq(v1, v2):
         raise e
 
 
+def test_rotate():
+    assert_eq(make_robot(0, 0, "E"),
+              rotate_robot(make_robot(0, 0, "N"), "R"))
+
+    assert_eq(make_robot(0, 0, "W"),
+              rotate_robot(make_robot(0, 0, "N"), "L"))
+
+
 def test_move_simple():
     res = play(10, 20, (
-        (0, 0, "N", "FLF"),
+        (0, 0, "N", "FRF"),
     ))
-    assert_eq(res, ((True, (1, 1, 'W')),))
+    assert_eq(res, ((True, (1, 1, 'E')),))
 
 
 def test_rotate_simple():
@@ -205,6 +199,18 @@ def test_scent():
         (False, (5, 20, 'N')),
         (True, (5, 19, 'N')),
     ))
+
+
+def test_scent_more():
+    res = play(10, 20, (
+        (5, 5, "N", "FFFFFFFFFFFFFFFF"),
+        (5, 5, "N", "FFFFFFFFFFFFFFFFRF"),
+    ))
+    assert_eq(res, (
+        (False, (5, 20, 'N')),
+        (True, (6, 19, 'E')),
+    ))
+
 
 
 def main_tests():
