@@ -6,3 +6,12 @@ The main points on that task:
 - There is a quick-and-dirty test suite inside. It's compatible with PyTest. I
   added my own test runner system to not depend on PyTest library.
 - Tested with Python 2.7
+
+Example:
+
+```
+cat sample.txt | python mars.py
+1 1 E
+3 3 N LOST
+2 3 S
+```
