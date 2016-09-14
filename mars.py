@@ -4,10 +4,27 @@ from StringIO import StringIO
 
 
 def make_world(w, h):
+    """
+    The world is represented by a tuple (w, h, scents), where:
+    - w: width,
+    - h: height,
+    - scents: a tuple of pairs (x, y).
+    """
     return w, h, ()
 
 
 def parse_input(source):
+    """
+    Parses input data from a file-like object.
+    Returns a tuple (w, h, routes), where:
+    - w: width,
+    - h: height,
+    - routes: a tuple of (x, y, ori, steps), where:
+    - x: x position,
+    - y: y position,
+    - ori: orientation, eg N, E, S, W
+    - steps: a string of robot commands, eg FLRFLF
+    """
     line = source.readline()
     w, h = map(int, line.split(" "))
 
@@ -29,7 +46,9 @@ def parse_input(source):
 
 
 def compose_results(results):
-
+    """
+    Turns game results into a string.
+    """
     def process(node):
         ok, (x, y, ori) = node
         return ('%s %s %s %s' % (
@@ -41,11 +60,16 @@ def compose_results(results):
 
 
 def make_robot(x, y, ori):
+    """
+    Makes a robot data structure.
+    """
     return (x, y, ori)
 
 
 def rotate_robot(robot, step):
-
+    """
+    Returns a new rotated robot.
+    """
     x, y, ori = robot
 
     rules = {
@@ -67,6 +91,9 @@ def rotate_robot(robot, step):
 
 
 def move_robot(robot):
+    """
+    Returns a new moved robot.
+    """
     x, y, ori = robot
 
     rules = {
@@ -86,6 +113,9 @@ def move_robot(robot):
 
 
 def is_placed(world, robot):
+    """
+    Checks whether a robot fits the world.
+    """
     w, h, _ = world
     x, y, _ = robot
 
@@ -96,6 +126,9 @@ def is_placed(world, robot):
 
 
 def is_scent(world, robot):
+    """
+    Checks whether a robot stands on a scent cell.
+    """
     _, _, scents = world
     x, y, _ = robot
 
@@ -103,13 +136,22 @@ def is_scent(world, robot):
 
 
 def set_scent(world, robot):
+    """
+    Marks a cell that robot stands on as scent.
+    Returns a new world.
+    """
     w, h, scents = world
     x, y, _ = robot
     return w, h, scents + ((x, y), )
 
 
 def update(world, robot, step):
-
+    """
+    Makes a game turn. Returns a tuple (ok, world, robot), where:
+    - ok: whether a robot is on board or not (has fallen);
+    - world: a new world;
+    - robot: a new robot.
+    """
     if step in "LR":
         return True, world, rotate_robot(robot, step)
 
@@ -132,6 +174,11 @@ def update(world, robot, step):
 
 
 def play(w, h, routes):
+    """
+    Plays the game. Returns a tuple of (ok, robot), where:
+    - ok: whether a robot has reached the target (didn't fall);
+    - robot: a final robot's state.
+    """
     world = make_world(w, h)
 
     results = ()
@@ -257,6 +304,9 @@ def test_parser():
 
 
 def run_tests():
+    """
+    Niave test runner.
+    """
     for (name, func) in globals().iteritems():
         if name.startswith("test_"):
             func()
