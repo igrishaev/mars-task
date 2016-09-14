@@ -23,8 +23,15 @@ def parse_input(source):
 
 
 def compose_results(results):
-    # todo
-    return ""
+
+    def process(node):
+        ok, (x, y, ori) = node
+        return '%s %s %s %s' % (
+            x, y, ori, ("" if ok else "LOST")
+        )
+
+
+    return ''.join(map(process, results))
 
 
 def make_robot(x, y, ori):
@@ -131,7 +138,10 @@ def play(x, y, routes):
 
 
 def main():
-    x, y, routes = parse_input(sys.stdin)
+    x, y, routes = 10, 20, (
+        (0, 0, "N", "LFFFF"),
+    )
+    # x, y, routes = parse_input(sys.stdin)
     results = play(x, y, routes)
     print compose_results(results)
 
@@ -221,4 +231,4 @@ def main_tests():
 
 if __name__ == "__main__":
     main_tests()
-    # main()
+    main()
