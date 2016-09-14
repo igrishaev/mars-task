@@ -2,13 +2,13 @@
 import sys
 
 
-def make_world(x, y):
-    return x, y, ()
+def make_world(w, h):
+    return w, h, ()
 
 
 def parse_input(source):
     line = source.readline()
-    x, y = map(int, line.split(" "))
+    w, h = map(int, line.split(" "))
 
     routes = ()
     lines = source.readlines()
@@ -24,7 +24,7 @@ def parse_input(source):
             ori,
             lines[i+1],
         ),)
-    return x, y, routes
+    return w, h, routes
 
 
 def compose_results(results):
@@ -85,26 +85,26 @@ def move_robot(robot):
 
 
 def is_placed(world, robot):
-    wx, wy, _ = world
-    rx, ry, _ = robot
+    w, h, _ = world
+    x, y, _ = robot
 
     return (
-        0 <= rx <= wx
-        and 0 <= ry <= wy
+        0 <= x <= w
+        and 0 <= y <= h
     )
 
 
 def is_scent(world, robot):
     _, _, scents = world
-    rx, ry, _ = robot
+    x, y, _ = robot
 
-    return (rx, ry) in scents
+    return (x, y) in scents
 
 
 def set_scent(world, robot):
-    wx, wy, scents = world
-    rx, ry, _ = robot
-    return wx, wy, scents + ((rx, ry), )
+    w, h, scents = world
+    x, y, _ = robot
+    return w, h, scents + ((x, y), )
 
 
 def update(world, robot, step):
@@ -139,7 +139,6 @@ def play(x, y, routes):
         robot = make_robot(x, y, ori)
         for step in steps:
             ok, world, robot = update(world, robot, step)
-            print ok, world, robot, step
             if not ok:
                 break
 
@@ -215,7 +214,7 @@ def test_scent():
     ))
     assert_eq(res, (
         (False, (5, 20, 'N')),
-        (True, (5, 19, 'N')),
+        (True, (5, 20, 'N')),
     ))
 
 
@@ -226,7 +225,7 @@ def test_scent_more():
     ))
     assert_eq(res, (
         (False, (5, 20, 'N')),
-        (True, (6, 19, 'E')),
+        (True, (6, 20, 'E')),
     ))
 
 
@@ -266,5 +265,7 @@ def main_tests():
 
 
 if __name__ == "__main__":
-    # main_tests()
-    main()
+    if "test" in sys.argv:
+        main_tests()
+    else:
+        main()
