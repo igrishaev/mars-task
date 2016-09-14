@@ -22,6 +22,11 @@ def parse_input(source):
     pass
 
 
+def compose_output(results):
+    # todo
+    return ""
+
+
 def make_robot(x, y, ori):
     return (x, y, ori)
 
@@ -38,7 +43,7 @@ def rotate_robot(robot, step):
         ("E", "R"): "S",
 
         ("S", "L"): "E",
-        ("S", "E"): "W",
+        ("S", "R"): "W",
 
         ("W", "L"): "S",
         ("W", "R"): "N",
@@ -112,7 +117,7 @@ def update(world, robot, step):
 def play(x, y, routes):
     world = make_world(x, y)
 
-    results = []
+    results = ()
 
     for (x, y, ori, steps) in routes:
         robot = make_robot(x, y, ori)
@@ -120,7 +125,8 @@ def play(x, y, routes):
             ok, world, robot = update(world, robot, step)
             if not ok:
                 break
-        results.append(robot)
+
+        results += ((ok, robot), )
 
     return results
 
@@ -147,26 +153,58 @@ def main():
 # ---- tests
 
 
+def assert_eq(v1, v2):
+    try:
+        assert v1 == v2
+    except AssertionError as e:
+        print v1, " == ", v2
+        raise e
+
+
 def test_move_simple():
     res = play(10, 20, (
-        (0, 0, "N", ("F", "L", "F")),
+        (0, 0, "N", "FLF"),
     ))
-    assert res == [(1, 1, 'W')]
+    assert_eq(res, ((True, (1, 1, 'W')),))
 
 
 def test_rotate_simple():
     res = play(10, 20, (
-        (0, 0, "N", ("L", )),
+        (0, 0, "N", "L"),
     ))
-    assert res == [(0, 0, 'W')]
+    assert_eq(res, ((True, (0, 0, 'W')), ))
 
 
 def test_rotate_full():
     res = play(10, 20, (
-        (0, 0, "N", ("L", "L", "L", "L")),
+        (0, 0, "N", "LLLL"),
     ))
-    assert res == [(0, 0, 'N')]
+    assert_eq(res, ((True, (0, 0, 'N')),))
 
+
+def test_go_circle():
+    res = play(10, 20, (
+        (5, 5, "N", "RRFLFLFLFR"),
+    ))
+    assert_eq(res, ((True, (5, 5, 'N')),))
+
+
+def test_drops():
+    res = play(10, 20, (
+        (5, 5, "N", "FFFFFFFFFFFFFFFF"),
+    ))
+    assert_eq(res, ((False, (5, 20, 'N')),))
+
+
+def test_scent():
+    res = play(10, 20, (
+        (5, 5, "N", "FFFFFFFFFFFFFFFF"),
+        (5, 5, "N", "FFFFFFFFFFFFFFFF"),
+    ))
+    assert_eq(res, (
+        (False, (5, 20, 'N')),
+        (True, (5, 19, 'N')),
+    ))
 
 
 def main_tests():
