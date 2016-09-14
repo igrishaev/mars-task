@@ -1,5 +1,6 @@
 
 import sys
+from StringIO import StringIO
 
 
 def make_world(w, h):
@@ -130,8 +131,8 @@ def update(world, robot, step):
                 return False, set_scent(world, robot), robot
 
 
-def play(x, y, routes):
-    world = make_world(x, y)
+def play(w, h, routes):
+    world = make_world(w, h)
 
     results = ()
 
@@ -148,8 +149,8 @@ def play(x, y, routes):
 
 
 def main():
-    x, y, routes = parse_input(sys.stdin)
-    results = play(x, y, routes)
+    w, h, routes = parse_input(sys.stdin)
+    results = play(w, h, routes)
     print compose_results(results)
 
 
@@ -235,13 +236,10 @@ def test_composer():
         (False, (5, 20, "L")),
         (True, (8, 42, "S")),
     ))
-    assert_eq(output, """1 2 N
-5 20 L LOST
-8 42 S""")
+    assert_eq(output, "1 2 N\n5 20 L LOST\n8 42 S")
 
 
 def test_parser():
-    from StringIO import StringIO
     io = StringIO()
     io.write('3 5\n')
     io.write('1 2 N\n')
@@ -258,7 +256,7 @@ def test_parser():
     )))
 
 
-def main_tests():
+def run_tests():
     for (name, func) in globals().iteritems():
         if name.startswith("test_"):
             func()
@@ -266,6 +264,6 @@ def main_tests():
 
 if __name__ == "__main__":
     if "test" in sys.argv:
-        main_tests()
+        run_tests()
     else:
         main()
