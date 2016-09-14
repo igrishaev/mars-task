@@ -1,5 +1,4 @@
 
-
 import sys
 
 
@@ -8,7 +7,22 @@ def make_world(x, y):
 
 
 def parse_input(source):
-    pass
+    # line = source.readline()
+    # x, y = map(int, line.split(" "))
+
+    # routes = []
+    # lines = source.readlines()
+    # # routes = []
+    # #
+    # # for line in lines:
+    # #     ln =
+    # #     x, y, ori, steps
+    # #     routes.append(x, y, ori, steps)
+    # return x, y, routes
+    return (10, 20, [
+        (3, 19, "N", ("F", "F", "F")),
+        (3, 19, "N", ("F", "F", "F")),
+    ])
 
 
 def make_robot(x, y, ori):
@@ -21,12 +35,16 @@ def rotate_robot(robot, step):
 
     rules = {
         ("N", "L"): "W",
-        ("_", "_"): "_",
-        ("_", "_"): "_",
-        ("_", "_"): "_",
-        ("_", "_"): "_",
-        ("_", "_"): "_",
-        ("_", "_"): "_",
+        ("N", "R"): "E",
+
+        ("E", "L"): "N",
+        ("E", "R"): "S",
+
+        ("S", "L"): "E",
+        ("S", "E"): "W",
+
+        ("W", "L"): "S",
+        ("W", "R"): "N",
     }
 
     new_ori = rules[(ori, step)]
@@ -53,18 +71,27 @@ def move_robot(robot):
     )
 
 
-def will_fall(world, robot):
-    pass
+def will_stand(world, robot):
+    wx, wy, _ = world
+    rx, ry, _ = robot
+
+    return (
+        0 <= rx <= wx
+        and 0 <= ry <= wy
+    )
 
 
 def is_scent(world, robot):
-    pass
+    _, _, scents = world
+    rx, ry, _ = robot
+
+    return (rx, ry) in scents
 
 
 def set_scent(world, robot):
-    x, y, scents = world
-    _x, _y, _ori = robot
-    return x, y, scents + (_x, _y)
+    wx, wy, scents = world
+    rx, ry, _ = robot
+    return wx, wy, scents + ((rx, ry), )
 
 
 def update(world, robot, step):
@@ -76,8 +103,8 @@ def update(world, robot, step):
 
         next_robot = move_robot(robot)
 
-        if will_fall(world, next_robot):
-            return False, set_scent(world, next_robot), robot
+        if not will_stand(world, next_robot):
+            return False, set_scent(world, robot), robot
 
         if is_scent(world, next_robot):
             return True, world, robot
@@ -85,13 +112,29 @@ def update(world, robot, step):
         return True, world, next_robot
 
 
-def main():
-    x, y, inputs = parse_input(sys.stdin)
+def play(x, y, routes):
     world = make_world(x, y)
 
-    for (x, y, ori, steps) in inputs:
+    results = []
+
+    for (x, y, ori, steps) in routes:
         robot = make_robot(x, y, ori)
         for step in steps:
             ok, world, robot = update(world, robot, step)
+            print ok, world, robot
             if not ok:
                 break
+        results.append(robot)
+
+    return results
+
+
+
+def main():
+    x, y, routes = parse_input(sys.stdin)
+    results = play(x, y, routes)
+    print results
+
+
+if __name__ == "__main__":
+    main()
