@@ -84,7 +84,7 @@ def move_robot(robot):
     )
 
 
-def will_stand(world, robot):
+def is_placed(world, robot):
     wx, wy, _ = world
     rx, ry, _ = robot
 
@@ -114,16 +114,20 @@ def update(world, robot, step):
 
     if step == "F":
 
-        next_robot = move_robot(robot)
+        robot_next = move_robot(robot)
+        placed_next = is_placed(world, robot_next)
 
-        if not will_stand(world, next_robot):
-            return False, set_scent(world, robot), robot
+        if is_scent(world, robot):
+            if placed_next:
+                return True, world, robot_next
+            else:
+                return True, world, robot
 
-        # todo test is scent now
-        if is_scent(world, next_robot):
-            return True, world, robot
-
-        return True, world, next_robot
+        else:
+            if placed_next:
+                return True, world, robot_next
+            else:
+                return False, set_scent(world, robot), robot
 
 
 def play(x, y, routes):
