@@ -7,19 +7,24 @@ def make_world(x, y):
 
 
 def parse_input(source):
-    # line = source.readline()
-    # x, y = map(int, line.split(" "))
-    # todo
-    # routes = []
-    # lines = source.readlines()
-    # # routes = []
-    # #
-    # # for line in lines:
-    # #     ln =
-    # #     x, y, ori, steps
-    # #     routes.append(x, y, ori, steps)
-    # return x, y, routes
-    pass
+    line = source.readline()
+    x, y = map(int, line.split(" "))
+
+    routes = ()
+    lines = source.readlines()
+
+    lines = map(str.strip, lines)
+    lines = filter(None, lines)
+
+    for i in xrange(0, len(lines) - 1, 2):
+        _x, _y, ori = lines[i].split(" ")
+        routes += ((
+            int(_x),
+            int(_y),
+            ori,
+            lines[i+1],
+        ),)
+    return x, y, routes
 
 
 def compose_results(results):
@@ -114,6 +119,7 @@ def update(world, robot, step):
         if not will_stand(world, next_robot):
             return False, set_scent(world, robot), robot
 
+        # todo test is scent now
         if is_scent(world, next_robot):
             return True, world, robot
 
@@ -129,6 +135,7 @@ def play(x, y, routes):
         robot = make_robot(x, y, ori)
         for step in steps:
             ok, world, robot = update(world, robot, step)
+            print ok, world, robot, step
             if not ok:
                 break
 
@@ -138,10 +145,7 @@ def play(x, y, routes):
 
 
 def main():
-    x, y, routes = 10, 20, (
-        (0, 0, "N", "LFFFF"),
-    )
-    # x, y, routes = parse_input(sys.stdin)
+    x, y, routes = parse_input(sys.stdin)
     results = play(x, y, routes)
     print compose_results(results)
 
@@ -233,6 +237,24 @@ def test_composer():
 8 42 S""")
 
 
+def test_parser():
+    from StringIO import StringIO
+    io = StringIO()
+    io.write('3 5\n')
+    io.write('1 2 N\n')
+    io.write('FFLFRL\n')
+    io.write('\n')
+    io.write('20 1 S\n')
+    io.write('LLRRFFL\n')
+    io.seek(0)
+
+    data = parse_input(io)
+    assert_eq(data, (3, 5, (
+        (1, 2, "N", "FFLFRL"),
+        (20, 1, "S", "LLRRFFL"),
+    )))
+
+
 def main_tests():
     for (name, func) in globals().iteritems():
         if name.startswith("test_"):
@@ -240,5 +262,5 @@ def main_tests():
 
 
 if __name__ == "__main__":
-    main_tests()
+    # main_tests()
     main()
