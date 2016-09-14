@@ -9,7 +9,7 @@ def make_world(x, y):
 def parse_input(source):
     # line = source.readline()
     # x, y = map(int, line.split(" "))
-
+    # todo
     # routes = []
     # lines = source.readlines()
     # # routes = []
@@ -19,10 +19,7 @@ def parse_input(source):
     # #     x, y, ori, steps
     # #     routes.append(x, y, ori, steps)
     # return x, y, routes
-    return (10, 20, [
-        (3, 19, "N", ("F", "F", "F")),
-        (3, 19, "N", ("F", "F", "F")),
-    ])
+    pass
 
 
 def make_robot(x, y, ori):
@@ -121,7 +118,6 @@ def play(x, y, routes):
         robot = make_robot(x, y, ori)
         for step in steps:
             ok, world, robot = update(world, robot, step)
-            print ok, world, robot
             if not ok:
                 break
         results.append(robot)
@@ -131,10 +127,54 @@ def play(x, y, routes):
 
 
 def main():
-    x, y, routes = parse_input(sys.stdin)
+
+    # x, y, routes = (10, 20, [
+    #     (3, 19, "N", ("F", "F", "F")),
+    #     (3, 19, "N", ("F", "F", "F")),
+    # ])
+
+    x, y, routes = (10, 20, [
+        (0, 0, "N", ("F", "L", "F")),
+        # (3, 19, "N", ("F", "F", "F")),
+    ])
+
+    # x, y, routes = parse_input(sys.stdin)
+
     results = play(x, y, routes)
     print results
 
 
+# ---- tests
+
+
+def test_move_simple():
+    res = play(10, 20, (
+        (0, 0, "N", ("F", "L", "F")),
+    ))
+    assert res == [(1, 1, 'W')]
+
+
+def test_rotate_simple():
+    res = play(10, 20, (
+        (0, 0, "N", ("L", )),
+    ))
+    assert res == [(0, 0, 'W')]
+
+
+def test_rotate_full():
+    res = play(10, 20, (
+        (0, 0, "N", ("L", "L", "L", "L")),
+    ))
+    assert res == [(0, 0, 'N')]
+
+
+
+def main_tests():
+    for (name, func) in globals().iteritems():
+        if name.startswith("test_"):
+            func()
+
+
 if __name__ == "__main__":
-    main()
+    main_tests()
+    # main()
