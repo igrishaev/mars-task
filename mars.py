@@ -305,7 +305,7 @@ def test_parser():
 
 def run_tests():
     """
-    Niave test runner.
+    Naive test runner.
     """
     for (name, func) in globals().iteritems():
         if name.startswith("test_"):
