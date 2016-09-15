@@ -25,23 +25,33 @@ def parse_input(source):
     - ori: orientation, eg N, E, S, W
     - steps: a string of robot commands, eg FLRFLF
     """
-    line = source.readline()
-    w, h = map(int, line.split(" "))
 
-    routes = ()
     lines = source.readlines()
-
     lines = map(str.strip, lines)
     lines = filter(None, lines)
 
-    for i in xrange(0, len(lines) - 1, 2):
-        _x, _y, ori = lines[i].split(" ")
-        routes += ((
-            int(_x),
-            int(_y),
-            ori,
-            lines[i+1],
-        ),)
+    head, rest = lines[0], lines[1:]
+
+    w, h = map(int, head.split(" "))
+
+    def parse_iter(lines, result=()):
+
+        if not lines:
+            return result
+
+        line1 = lines[0]
+        line2 = lines[1]
+
+        x_str, y_str, ori = line1.split(" ")
+        x = int(x_str)
+        y = int(y_str)
+
+        steps = line2
+        node = (x, y, ori, steps)
+
+        return parse_iter(lines[2:], result + (node, ))
+
+    routes = parse_iter(rest)
     return w, h, routes
 
 
