@@ -1,6 +1,5 @@
 
 import sys
-from StringIO import StringIO
 
 
 def make_world(w, h):
@@ -201,15 +200,16 @@ def play(w, h, routes):
     - ok: whether a robot has reached the target (didn't fall);
     - robot: a final robot's state.
     """
-    world = make_world(w, h)
-    results = ()
+    def iterate(world, routes, results):
+        if routes:
+            (x, y, ori, steps) = routes[0]
+            robot = make_robot(x, y, ori)
+            world, robot, flag = robot_play(world, robot, steps)
+            return iterate(world, routes[1:], results + ((flag, robot), ))
+        else:
+            return results
 
-    for (x, y, ori, steps) in routes:
-        robot = make_robot(x, y, ori)
-        world, robot, flag = robot_play(world, robot, steps)
-        results += ((flag, robot), )
-
-    return results
+    return iterate(make_world(w, h), routes, ())
 
 
 def main():
@@ -304,6 +304,8 @@ def test_composer():
 
 
 def test_parser():
+    from StringIO import StringIO
+
     io = StringIO()
     io.write('3 5\n')
     io.write('1 2 N\n')
