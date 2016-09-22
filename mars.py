@@ -158,12 +158,12 @@ def set_scent(world, robot):
 def update(world, robot, step):
     """
     Makes a game turn. Returns a tuple (ok, world, robot), where:
-    - ok: whether a robot is on board or not (has fallen);
     - world: a new world;
-    - robot: a new robot.
+    - robot: a new robot;
+    - ok: whether a robot is on board or not (has fallen).
     """
     if step in "LR":
-        return True, world, rotate_robot(robot, step)
+        return world, rotate_robot(robot, step), True
 
     if step == "F":
 
@@ -172,15 +172,27 @@ def update(world, robot, step):
 
         if is_scent(world, robot):
             if placed_next:
-                return True, world, robot_next
+                return world, robot_next, True
             else:
-                return True, world, robot
+                return world, robot, True
 
         else:
             if placed_next:
-                return True, world, robot_next
+                return world, robot_next, True
             else:
-                return False, set_scent(world, robot), robot
+                return set_scent(world, robot), robot, False
+
+
+def robot_play(world, robot, steps):
+
+    def iterate(world, robot, steps, flag):
+        if steps and flag:
+            world, robot, flag = update(world, robot, steps[0])
+            return iterate(world, robot, steps[1:], flag)
+        else:
+            return world, robot, flag
+
+    return iterate(world, robot, steps, True)
 
 
 def play(w, h, routes):
@@ -190,17 +202,12 @@ def play(w, h, routes):
     - robot: a final robot's state.
     """
     world = make_world(w, h)
-
     results = ()
 
     for (x, y, ori, steps) in routes:
         robot = make_robot(x, y, ori)
-        for step in steps:
-            ok, world, robot = update(world, robot, step)
-            if not ok:
-                break
-
-        results += ((ok, robot), )
+        world, robot, flag = robot_play(world, robot, steps)
+        results += ((flag, robot), )
 
     return results
 
